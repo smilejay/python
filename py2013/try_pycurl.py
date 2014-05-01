@@ -10,7 +10,6 @@ Created on Dec 15, 2013
 import sys
 import pycurl
 import time
-from test.test_iterlen import len
 
 class Test:
     def __init__(self):
