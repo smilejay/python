@@ -2,18 +2,12 @@
 #coding=utf-8
 # FROM: http://blog.sina.com.cn/s/blog_4ef8be9f0100fe67.html
 
-import re
 import os
 import sys
 import time
-import glob
-import string
-import socket
-import getopt
 import urllib
 import urllib2
 import threading
-from sgmllib import SGMLParser
 
 #############################################################################
 #
