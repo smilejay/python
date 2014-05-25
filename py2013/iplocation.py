@@ -4,12 +4,14 @@
 '''
 Created on Oct 20, 2013
 @summary: geography info about an IP address
-@author: Jay <smilejay.com>
+@author: Jay <smile665@gmail.com>     http://smilejay.com/
 '''
 
 import json, urllib2
-from HTMLParser import HTMLParser
 import re
+from selenium import webdriver
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+
 
 class location_freegeoip():
     '''
@@ -93,6 +95,7 @@ class location_taobao():
         datadict = self.get_geoinfo()
         return datadict[key]
 
+
 class location_qq():
     '''
     build the mapping of the ip address and its location.
@@ -118,18 +121,17 @@ class location_qq():
             return None
         
     def get_region(self):
-        print self.get_geoinfo()[0]
         return self.get_geoinfo()[0]
     
     def get_isp(self):
-        print self.get_geoinfo()[1]
         return self.get_geoinfo()[1]
 
-# FIXME: this class can't work correctly yet.
+
 class location_ipdotcn():
     '''
     build the mapping of the ip address and its location.
     the geo info is from www.ip.cn
+    need to use PhantomJS to open the URL to render its JS
     '''
     def __init__(self, ip):
         '''
@@ -137,40 +139,24 @@ class location_ipdotcn():
         '''
         self.ip = ip
         self.api_url = 'http://www.ip.cn/%s' % ip
-        print self.api_url
     
     def get_geoinfo(self):
-        user_agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.8; rv:24.0) Gecko/20100101 Firefox/24.0'
-        myheaders = {'User-Agent' : user_agent}
-        req = urllib2.Request(self.api_url, headers=myheaders)
-        urlobj = urllib2.urlopen(req)
-        data = urlobj.read()
-        print data
-        myparser = MyHTMLParser()
-        myparser.feed(data)
+        dcap = dict(DesiredCapabilities.PHANTOMJS)
+        dcap["phantomjs.page.settings.userAgent"] = (
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.9; rv:25.0) Gecko/20100101 Firefox/29.0 " )
+        driver = webdriver.PhantomJS(executable_path='/usr/local/bin/phantomjs', desired_capabilities=dcap)
+        driver.get(self.api_url)
+        text = driver.find_element_by_xpath('//div[@id="result"]/div/p').text
+        res = text.split('来自：')[1].split(' ')
+        driver.quit()
+        return res
 
-class MyHTMLParser(HTMLParser):
-    '''
-    build the subclass of HTMLParser.
-    '''
-    def handle_starttag(self, tag, attrs):
-        print "Start tag:", tag
-        for attr in attrs:
-            print "     attr:", attr
-    def handle_endtag(self, tag='span'):
-        print "End tag  :", tag
-    def handle_data(self, data):
-        print "Data     :", data
-    def handle_comment(self, data):
-        print "Comment  :", data
-    def handle_charref(self, name):
-        if name.startswith('x'):
-            c = unichr(int(name[1:], 16))
-        else:
-            c = unichr(int(name))
-        print "Num ent  :", c
-    def handle_decl(self, data):
-        print "Decl     :", data
+    def get_region(self):
+        return self.get_geoinfo()[0]
+
+    def get_isp(self):
+        return self.get_geoinfo()[1]
+
     
 if __name__ == '__main__':
     ip = '110.84.0.129'
@@ -180,7 +166,8 @@ if __name__ == '__main__':
 #    print iploc.get_region()
 #    print iploc.get_city()
 #    print iploc.get_isp()
-    iploc = location_qq(ip)
+#    iploc = location_qq(ip)
+    iploc = location_ipdotcn(ip)
 #    iploc.get_geoinfo()
-    iploc.get_region()
-    iploc.get_isp()
+    print iploc.get_region()
+    print iploc.get_isp()
