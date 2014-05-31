@@ -138,5 +138,7 @@ def paxel(url, output, blocks=6, proxies=local_proxies):
 
 if __name__ == '__main__':
     url = 'http://dldir1.qq.com/qqfile/QQforMac/QQ_V3.1.1.dmg'
+    # dowloading this master.zip file is a bug
+    # url = 'https://github.com/openstack/nova/archive/master.zip'
     output = 'download.file'
     paxel(url, output, blocks=4, proxies={})
