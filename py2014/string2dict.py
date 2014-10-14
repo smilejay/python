@@ -11,13 +11,17 @@ import json
 
 def my_run():
     try:
-        m = '{"host":"10.1.77.20", "port":3306, "user":"abc",\
+        s = '{"host":"10.1.77.20", "port":3306, "user":"abc",\
               "passwd":"123", "db":"mydb", "connect_timeout":10}'
-        d = ast.literal_eval(m)
+        d = ast.literal_eval(s)
         print type(d)
         print d
-        d2 = json.loads(m)
+        d1 = eval(s)
+        print type(d1)
+        print d1
+        d2 = json.loads(s)
         print type(d2)
+        print d2
         MySQLdb.Connect(host=d['host'], port=d['port'], user=d['user'],
                         passwd=d['passwd'], db=d['db'],
                         connect_timeout=d['connect_timeout'])
