@@ -15,9 +15,11 @@ import sys
 import os
 import time
 import urllib
-from threading import Thread
+from threading import Thread, Lock
 import shutil
 from contextlib import closing
+
+printLocker = Lock()
 
 # in case you want to use http_proxy
 local_proxies = {'http': 'http://131.139.58.200:8080'}
@@ -28,7 +30,7 @@ class AxelPython(Thread, urllib.FancyURLopener):
 
         run() is a vitural method of Thread.
     '''
-    def __init__(self, threadname, url, filename, ranges=0, proxies={}):
+    def __init__(self, threadname, url, filename, ranges, proxies={}):
         Thread.__init__(self, name=threadname)
         urllib.FancyURLopener.__init__(self, proxies)
         self.name = threadname
@@ -54,7 +56,9 @@ class AxelPython(Thread, urllib.FancyURLopener):
             return
 
         self.oneTimeSize = 16384  # 16kByte/time
+        printLocker.acquire()
         print 'task %s will download from %d to %d' % (self.name, self.startpoint, self.ranges[1])
+        printLocker.release()
 
         self.addheader("Range", "bytes=%d-%d" % (self.startpoint, self.ranges[1]))
         self.urlhandle = self.open(self.url)
@@ -122,6 +126,8 @@ def paxel(url, output, blocks=6, proxies=local_proxies):
         sys.stdout.write(show)
         sys.stdout.flush()
         time.sleep(0.5)
+    sys.stdout.write(u'\rFilesize:{0} Downloaded:{0} Completed:100%  \n'.format(size))
+    sys.stdout.flush()
 
     with open(output, 'wb+') as filehandle:
         for i in filename:
