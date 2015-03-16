@@ -16,6 +16,7 @@ import os
 import time
 import urllib
 from threading import Thread
+import shutil
 
 # in case you want to use http_proxy
 local_proxies = {'http': 'http://131.139.58.200:8080'}
@@ -123,18 +124,14 @@ def paxel(url, output, blocks=6, proxies=local_proxies):
         sys.stdout.flush()
         time.sleep(0.5)
 
-    filehandle = open(output, 'wb+')
-    for i in filename:
-        f = open(i, 'rb')
-        filehandle.write(f.read())
-        f.close()
-        try:
-            os.remove(i)
-            pass
-        except:
-            pass
-
-    filehandle.close()
+    with open(output, 'wb+') as filehandle:
+        for i in filename:
+            with open(i, 'rb') as f:
+                shutil.copyfileobj(f, filehandle, 102400)
+            try:
+                os.remove(i)
+            except OSError:
+                pass
 
 if __name__ == '__main__':
     url = 'http://dldir1.qq.com/qqfile/QQforMac/QQ_V3.1.1.dmg'
