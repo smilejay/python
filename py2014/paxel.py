@@ -17,6 +17,7 @@ import time
 import urllib
 from threading import Thread
 import shutil
+from contextlib import closing
 
 # in case you want to use http_proxy
 local_proxies = {'http': 'http://131.139.58.200:8080'}
@@ -72,14 +73,12 @@ class AxelPython(Thread, urllib.FancyURLopener):
 
 
 def GetUrlFileSize(url, proxies={}):
-    urlHandler = urllib.urlopen(url, proxies=proxies)
-    headers = urlHandler.info().headers
-    length = 0
-    for header in headers:
-        if header.find('Length') != -1:
-            length = header.split(':')[-1].strip()
-            length = int(length)
-    return length
+    with closing(urllib.urlopen(url, proxies=proxies)) as urlHandler:
+        length = urlHandler.headers.getheader('Content-Length')
+        if length is None:
+            return 0
+        else:
+            return int(length)
 
 
 def SpliteBlocks(totalsize, blocknumber):
