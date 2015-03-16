@@ -15,7 +15,11 @@ import sys
 import os
 import time
 import urllib
-from threading import Thread
+from threading import Thread, Lock
+import shutil
+from contextlib import closing
+
+printLocker = Lock()
 
 # in case you want to use http_proxy
 local_proxies = {'http': 'http://131.139.58.200:8080'}
@@ -26,7 +30,7 @@ class AxelPython(Thread, urllib.FancyURLopener):
 
         run() is a vitural method of Thread.
     '''
-    def __init__(self, threadname, url, filename, ranges=0, proxies={}):
+    def __init__(self, threadname, url, filename, ranges, proxies={}):
         Thread.__init__(self, name=threadname)
         urllib.FancyURLopener.__init__(self, proxies)
         self.name = threadname
@@ -52,7 +56,9 @@ class AxelPython(Thread, urllib.FancyURLopener):
             return
 
         self.oneTimeSize = 16384  # 16kByte/time
+        printLocker.acquire()
         print 'task %s will download from %d to %d' % (self.name, self.startpoint, self.ranges[1])
+        printLocker.release()
 
         self.addheader("Range", "bytes=%d-%d" % (self.startpoint, self.ranges[1]))
         self.urlhandle = self.open(self.url)
@@ -71,14 +77,12 @@ class AxelPython(Thread, urllib.FancyURLopener):
 
 
 def GetUrlFileSize(url, proxies={}):
-    urlHandler = urllib.urlopen(url, proxies=proxies)
-    headers = urlHandler.info().headers
-    length = 0
-    for header in headers:
-        if header.find('Length') != -1:
-            length = header.split(':')[-1].strip()
-            length = int(length)
-    return length
+    with closing(urllib.urlopen(url, proxies=proxies)) as urlHandler:
+        length = urlHandler.headers.getheader('Content-Length')
+        if length is None:
+            return 0
+        else:
+            return int(length)
 
 
 def SpliteBlocks(totalsize, blocknumber):
@@ -122,19 +126,17 @@ def paxel(url, output, blocks=6, proxies=local_proxies):
         sys.stdout.write(show)
         sys.stdout.flush()
         time.sleep(0.5)
+    sys.stdout.write(u'\rFilesize:{0} Downloaded:{0} Completed:100%  \n'.format(size))
+    sys.stdout.flush()
 
-    filehandle = open(output, 'wb+')
-    for i in filename:
-        f = open(i, 'rb')
-        filehandle.write(f.read())
-        f.close()
-        try:
-            os.remove(i)
-            pass
-        except:
-            pass
-
-    filehandle.close()
+    with open(output, 'wb+') as filehandle:
+        for i in filename:
+            with open(i, 'rb') as f:
+                shutil.copyfileobj(f, filehandle, 102400)
+            try:
+                os.remove(i)
+            except OSError:
+                pass
 
 if __name__ == '__main__':
     url = 'http://dldir1.qq.com/qqfile/QQforMac/QQ_V3.1.1.dmg'
