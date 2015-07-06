@@ -8,8 +8,7 @@ from fabric.operations import run, put
 from fabric.api import task, env
 
 env.hosts = ['192.168.1.2', '192.168.1.3', '192.168.1.4']
-env.hosts = ['192.168.217.200']
-env.port = 58422
+env.port = 22
 env.user = 'root'
 env.password = '123456'
 
