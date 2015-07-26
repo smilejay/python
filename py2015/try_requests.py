@@ -3,6 +3,12 @@
 '''
 just try a lib for http request.
 # pip install requests
+
+To void an 'InsecurePlatformWarning':
+You only need to install the security package extras.
+$ pip install requests[security]
+or, install them directly:
+$ pip install pyopenssl ndg-httpsclient pyasn1
 '''
 
 import requests
