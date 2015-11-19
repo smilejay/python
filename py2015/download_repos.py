@@ -1,7 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
 import os
-import time
 
 
 class repos(object):
@@ -32,7 +31,7 @@ class repos(object):
                         the_file.write(request.content)
 
     def get_urls_dict(self, path='/', parent=None):
-        if not path in self.urls_dict:
+        if path not in self.urls_dict:
             self.urls_dict[path] = {
                 'parent': parent, 'sub_dirs': [], 'files': []}
             url = self.base_url + path
