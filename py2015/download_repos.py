@@ -1,6 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 import os
+from urllib import import unquote
 
 
 class repos(object):
@@ -39,7 +40,7 @@ class repos(object):
             if request.ok:
                 soup = BeautifulSoup(request.text, 'html.parser')
                 for url in soup.find_all('a'):
-                    url_text = url.get('href')
+                    url_text = unquote(url.get('href'))
                     if url_text.endswith('/') and url_text != '../':
                         self.urls_dict[path]['sub_dirs'].append(url_text)
                     elif not url_text.endswith('/'):
