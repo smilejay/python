@@ -1,7 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 import os
-from urllib import import unquote
+from urllib import unquote
 
 
 class repos(object):
