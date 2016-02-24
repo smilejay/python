@@ -35,10 +35,10 @@ def add_remove(tlist, opt_list):
             if i[1:] in tlist:
                 tlist.remove(i[1:])
             else:
-                print 'bad argemtn: %s is not in %s' % (i[1:], tlist)
+                print 'bad argument: %s is not in %s' % (i[1:], tlist)
                 flag = 1
         else:
-            print 'bad argment: %s' % i
+            print 'bad argument: %s' % i
             flag = 1
     if flag:
         return flag
