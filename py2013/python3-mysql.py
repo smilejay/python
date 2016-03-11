@@ -3,19 +3,20 @@
 # see details from   http://dev.mysql.com/doc/connector-python/en/index.html
 
 import mysql.connector
-import sys, os
+import sys
+import os
 
 user = 'root'
-pwd  = '123456'
+pwd = '123456'
 host = '127.0.0.1'
-db   = 'test'
+db = 'test'
 
 data_file = 'mysql-test.dat'
 
 create_table_sql = "CREATE TABLE IF NOT EXISTS mytable ( \
                     id int(10) AUTO_INCREMENT PRIMARY KEY, \
-		    name varchar(20), age int(4) ) \
-		    CHARACTER SET utf8"
+                    name varchar(20), age int(4) ) \
+                    CHARACTER SET utf8"
 
 insert_sql = "INSERT INTO mytable(name, age) VALUES ('Jay', 22 ), ('杰', 26)"
 select_sql = "SELECT id, name, age FROM mytable"
@@ -44,11 +45,15 @@ if os.path.exists(data_file):
 
     for line in lines:
         myset = line.split()
-        sql = "INSERT INTO mytable (name, age) VALUES ('{}', {})".format(myset[0], myset[1])
+        sql = "INSERT INTO mytable (name, age) VALUES ('{}', {})".format(
+                                                                         myset
+                                                                         [0],
+                                                                         myset
+                                                                         [1])
         try:
             cursor.execute(sql)
         except mysql.connector.Error as err:
-            print("insert table 'mytable' from file 'mysql-test.dat' -- failed.")
+            print("insert table 'mytable' from file 'mysql-test.dat' - failed.")
             print("Error: {}".format(err.msg))
             sys.exit()
 
