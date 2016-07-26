@@ -47,9 +47,9 @@ class repos(object):
                 soup = BeautifulSoup(request.text, 'html.parser')
                 for url in soup.find_all('a'):
                     url_text = unquote(url.get('href'))
-                    if url_text.endswith('/') and url_text != '../':
+                    if url_text.endswith('/') and url_text != '/' and url_text != '../':
                         self.urls_dict[path]['sub_dirs'].append(url_text)
-                    elif not url_text.endswith('/'):
+                    elif not url_text.endswith('/') and not url_text.startswith('?'):
                         self.urls_dict[path]['files'].append(url_text)
         if self.urls_dict[path]['parent'] == None and len(self.urls_dict[path]['sub_dirs']) == 0:
             pass
@@ -64,7 +64,6 @@ class repos(object):
 
 
 if __name__ == '__main__':
-    # url = 'http://mirrors.aliyun.com/centos/6.7/os/x86_64'
     url = 'http://mirrors.163.com/centos/6.7/os/x86_64'
     the_dir = '/tmp/centos6u7'
     repo = repos(url, the_dir)
