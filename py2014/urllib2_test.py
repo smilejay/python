@@ -8,7 +8,7 @@ try:
     resp = urllib2.urlopen(req, timeout=5)
 except urllib2.HTTPError, e:
     if e.code == 404:
-        print 'response code %d' % e.code
+        print 'response code 404'
     else:
         print 'not 404. response code %d' % e.code
 except urllib2.URLError, e:
