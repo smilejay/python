@@ -3,7 +3,7 @@ calculate how many zero(0)s in the end of n!.
 '''
 
 
-def zero_cnt_of_factorial(num=50):
+def zero_cnt_of_factorial(num):
     count = 0
     i = 5
     while ((num / i) >= 1):
