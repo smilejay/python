@@ -23,5 +23,5 @@ def rename_files():
 #               print(new_name)
                 os.rename(os.path.join(path,file),os.path.join(path,new_name))
 
-if __namei_ == '__main__':
+if __name__ == '__main__':
     rename_files()
