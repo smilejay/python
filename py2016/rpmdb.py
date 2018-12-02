@@ -77,6 +77,7 @@ def check_db(module, timeout=10):
     elapsed_time = 0
     cmd = '%s -qa &> %s' % (RPMBIN, logfile)
     child = subprocess.Popen(cmd, shell=True)
+    
     while elapsed_time <= timeout:
         child_ret = child.poll()
         if child_ret is None:  # child still running
@@ -112,8 +113,8 @@ def main():
     # defining module
     module = AnsibleModule(
         argument_spec=dict(
-            action=dict(required=False, default='check', choices=['check', 'rebuild']),
-            timeout=dict(required=False, default=10, type='int')
+            action = dict(required=False, default='check', choices=['check', 'rebuild']),
+            timeout = dict(required=False, default=10, type='int')
         )
     )
 
@@ -126,13 +127,14 @@ def main():
     if action == 'check':
         rc = check_db(module, timeout)
         if rc == 1:
-            module.fail_json(msg='Error when running cmd: %s' % check_cmd)
+            module.fail_json(msg='Error when running cmd: %s' % (check_cmd))
         elif rc == 2:
             module.fail_json(msg='return code error. cmd: %s' % (check_cmd))
         elif rc == 3:
-            module.fail_json(msg='Timeout %d s. cmd: %s' % (timeout, check_cmd))
+            module.fail_json(msg='Timeout %d s. cmd: %s'      % (timeout, check_cmd))
         elif rc == 0:
             msg = 'OK. cmd: %s' % check_cmd
+            
     elif action == 'rebuild':
         rc = check_db(module, timeout)
         if rc != 0:
@@ -144,9 +146,9 @@ def main():
                 module.fail_json(msg=msg)
 
     module.exit_json(
-        changed=changed,
-        action=action,
-        msg=msg
+        changed = changed,
+        action = action,
+        msg = msg
     )
 
 # this is magic, see lib/ansible/executor/module_common.py
