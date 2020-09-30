@@ -53,6 +53,6 @@ def get_all_index(index_code_list):
 
 code_list = ['sz300036', 'sz000977', 'sh600718', 'sh600489']
 get_all_price(code_list)
-print("-----------------------------------------------------------------")
+print("-------------------------------------------------------------------------")
 index_code_list = ['sh000001', 'sz399001']
 get_all_index(index_code_list)
