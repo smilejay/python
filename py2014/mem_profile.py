@@ -33,6 +33,6 @@ def f(a, n=100):
 
 if __name__ == '__main__':
     a = my_func()
-    print ("cur_python_mem()")
-    print ("")
-    print (f"memory_usage((f, (1,), {'n': int(1e6)}), interval=0.5)")
+    print cur_python_mem()
+    print ""
+    print memory_usage((f, (1,), {'n': int(1e6)}), interval=0.5)
