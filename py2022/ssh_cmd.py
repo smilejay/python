@@ -1,4 +1,5 @@
 #!/usr/bin/python
+# *_* coding=utf-8 *_*
 
 import paramiko
 
@@ -28,6 +29,7 @@ def exec_cmd(cmd):
             print('connecting: %s' % h)
             client.connect(h, port=port, username=username, password=password,
                            timeout=5)
+            # 多次执行命令 可复用同一个Channel
             chan = client.get_transport().open_session()
             print('exec cmd: %s' % cmd)
             chan.exec_command(cmd)
@@ -43,6 +45,7 @@ def exec_cmd(cmd):
         except Exception as e:
             print(e)
         finally:
+            chan.close()
             client.close()
 
 
