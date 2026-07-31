@@ -29,6 +29,7 @@ import html
 import http.server
 import io
 import os
+import socket
 import socketserver
 import sys
 from email.parser import BytesParser
@@ -221,6 +222,36 @@ class ThreadingHTTPServer(socketserver.ThreadingMixIn,
     daemon_threads = True
 
 
+def _get_lan_ip():
+    """Best-effort detection of the primary LAN IPv4 address.
+
+    Opens a UDP socket "towards" a public address; no packet is actually
+    sent, but the OS picks the outbound interface, whose address is the
+    LAN IP other machines can use to reach this host. Falls back to
+    resolving the hostname, and returns None if nothing usable is found.
+    """
+    ip = None
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    try:
+        s.connect(("8.8.8.8", 80))
+        ip = s.getsockname()[0]
+    except OSError:
+        pass
+    finally:
+        s.close()
+
+    if not ip:
+        try:
+            ip = socket.gethostbyname(socket.gethostname())
+        except OSError:
+            ip = None
+
+    # Ignore loopback addresses: they don't help other machines connect.
+    if ip and ip.startswith("127."):
+        ip = None
+    return ip
+
+
 def run(port=8000, directory=None):
     handler_class = UploadHTTPRequestHandler
     if directory:
@@ -234,9 +265,17 @@ def run(port=8000, directory=None):
     httpd = ThreadingHTTPServer(server_address, handler_class)
     sa = httpd.socket.getsockname()
     serve_dir = directory or os.getcwd()
-    print("Serving HTTP on %s port %d (http://%s:%d/) ..."
-          % (sa[0], sa[1], sa[0], sa[1]))
+
+    print("Serving HTTP on %s port %d ..." % (sa[0], sa[1]))
     print("Serving directory: %s" % serve_dir)
+    print("Access URLs:")
+    print("  Local:   http://127.0.0.1:%d/" % port)
+    lan_ip = _get_lan_ip()
+    if lan_ip:
+        print("  Network: http://%s:%d/   <-- share this with others on the LAN"
+              % (lan_ip, port))
+    else:
+        print("  Network: (unable to detect LAN IPv4 address)")
     try:
         httpd.serve_forever()
     except KeyboardInterrupt:
